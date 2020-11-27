@@ -4,7 +4,7 @@
 
 [Rime](http://rime.im) 國語羅馬字拼音法式（簡稱國羅(GR)，另稱國音字母第二式、譯音符號）輸入方案。
     
-改編自 [**Chingyat/rime-romatzyh**](https://github.com/Chingyat/rime-romatzyh)
+改編自 [**Chingyat/rime-romatzyh**](https://github.com/Chingyat/rime-romatzyh)，增加不帶調連拼、簡寫法、模糊音、正詞法等功能
 
 ## 安裝
 
