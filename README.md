@@ -1,9 +1,6 @@
-# 国语罗马字
+# 國語羅馬字
+國語羅馬字拼音法式（Gwoyeu Romatzyh，簡稱國羅(GR)，另稱國音字母第二式、譯音符號）輸入方案。
+    
+允許在連詞拼寫中忽略聲調：ㄧ、ㄨ、ㄩ、ㄇ、ㄋ、ㄌ、ㄖ 開頭的以第二聲（陽平）爲準。
 
-配方： ℞ **chingyat/rime-romatzyh**
-
-[Rime](https://rime.im) 国语罗马字输入方案
-
-## 安装
-
-[东风破](https://github.com/rime/plum) 安装口令： `bash rime-install chingyat/rime-romatzyh`
+未開始輸入前，按V鍵使用反查功能。
