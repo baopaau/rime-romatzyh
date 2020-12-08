@@ -4,7 +4,7 @@
 schema:
   schema_id: romatzyh
   name: 國語羅馬字
-  version: "0.5"
+  version: "0.6"
   author:
     - 國語羅馬字拼音研究委員會(1925年)
     - chingyat <tsingyat@outlook.com>
@@ -235,9 +235,11 @@ translator:
     - xform/\<(\w+)5\>/.$1/
 
     # 正詞法（按需啓用）
-    - xform/^(\w*[aeiouyng]) ([aeiouyng]\w*?)$/$1-$2/
-    - xform/([aeioug])-([yg])/$1$2/
-    - xform/^(\S+?) (\S+?)$/$1$2/
+    - xform/^(\w*[^q]) ([aueo]\w*?)$/$1-$2/
+    - xform/^(\w*[aeyinl]) (i\w*?)$/$1-$2/
+    - xform/^(\w*[nlr]) (h\w*?)$/$1-$2/
+    - xform/^(\w*h) (w\w*?)$/$1-$2/
+    - xform/^(\S+?) \.?(\S+?)$/$1$2/
     
   preedit_format:
     - xform/^(.*)$/$1 / # 顯示所有註釋
