@@ -1,0 +1,45 @@
+# Rime schema patch
+patch:
+
+  # 隱藏鍵盤（限同文輸入法）
+  #"switches/@before 0":
+  #  options: [ _key_K_Hide ] # _key_Hide
+  #  states: [ ﹀ ]
+  
+  # 擴充詞庫
+  translator/dictionary: terra_pinyin.extended
+
+  # 繪文字
+  # https://github.com/rime/rime-emoji
+  "switches/@after last":
+    name: emoji
+    states: [ 文字 , 繪文字 ]
+    reset: 1
+  engine/filters/@next: simplifier@emoji
+  emoji:
+    opencc_config: emoji.json
+    option_name: emoji
+    tips: all
+
+
+  # 語言模型
+  # https://github.com/lotem/rime-octagram-data
+  #grammar/language: zh-hant-t-essay-bgw
+  #translator/contextual_suggestions: true
+  #translator/max_homophones: 5
+  #translator/max_homographs: 5
+  
+
+  # Lua腳本：Unicode 碼位輸入法
+  # https://github.com/baopaau/rime-lua-collection/
+  "engine/translators/@after last": "lua_translator@unicode_translator"
+  recognizer/patterns/unicode: "^U.*$"
+
+  # Lua腳本：計算器
+  # https://github.com/baopaau/rime-lua-collection/
+  engine/translators/@next: "lua_translator@calculator_translator"
+  recognizer/patterns/expression: "^=.*$"
+
+  # Lua腳本：爲候選項加上通字方案的註釋（整句）
+  "engine/filters/@after last": "lua_filter@reverse_lookup_filter_tungdzih"
+

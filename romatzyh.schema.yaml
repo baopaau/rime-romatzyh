@@ -4,7 +4,7 @@
 schema:
   schema_id: romatzyh
   name: 國語羅馬字
-  version: "0.6"
+  version: "0.9.1"
   author:
     - 國語羅馬字拼音研究委員會(1925年)
     - chingyat <tsingyat@outlook.com>
@@ -25,16 +25,10 @@ switches:
     states: [ 中文, ASCII ]
   - name: full_shape
     states: [ 半寬, 全寬 ]
-  - options: [ noop, simplification, trad_tw ]
-    states: [ 原形, 陆简, 臺正 ]
-    # 修改下行註釋，改變預設用字 [0, 1, 2 --> 對應上表]
-    reset: 0
+  - name: simplification
+    states: [ 漢字, 汉字 ]
   - name: ascii_punct
     states: [ 。，, ．， ]
-  - name: emoji_suggestion
-    states: [ 無繪文字 , 帶繪文字 ]
-    # 取消下行註釋，預設啓動 emoji
-    reset: 1
 
 engine:
   processors:
@@ -56,41 +50,42 @@ engine:
     - punct_translator
     - reverse_lookup_translator
     - table_translator@custom_phrase
+    - table_translator@easy_en
     - script_translator
   filters:
-    - simplifier@trad_tw
     - simplifier
-    - simplifier@emoji_suggestion
-    #- reverse_lookup_filter
     - uniquifier
 
 speller:
   alphabet: zyxwvutsrqponmlkjihgfedcba
   delimiter: " '"
+  use_space: false # 空格用作分詞而不是打出候選字
   algebra:
     - erase/^xx$/
     - xform/^r5/el/
 
-    # 忽略聲調
-    - fuzz/([^ywmnlr]\w+?)[2345]$/${1}1/
-    - fuzz/([ywmnlr]\w+?)[1345]$/${1}2/
-    - fuzz/3$/2/
+    # 忽略聲調（按需啓用）
+    #- fuzz/3$/2/
+    #- fuzz/([^ywmnlr]\w+?)[2345]$/${1}1/
+    #- fuzz/([ywmnlr]\w+?)[1345]$/${1}2/
 
-    # 不分uo/o
-    - derive/^([bpmf])o/$1uo/
+    - derive/^([bpmf])o/$1uo/ # 現代音ㄛ->ㄨㄛ
+    - derive/^([bpmfw])eng/$1ong/ # 讀書音ㄥ->ㄨㄥ
     - derive/^([dtnlgkhzcsr]h?)uo/$1o/ # lo(咯)
 
     # 模糊音（按需啓用）
     #- derive/([^iu][iea]n)g([1-5])$/$1$2/ # in<-ing/en<-eng/an<-ang
-    #- derive/([^iu][iea]n)([1-5])$/$1g$2/ # in->ing/en->eng/an->ang
+    - derive/([^iu][iea]n)([1-5])$/$1g$2/ # in->ing/en->eng/an->ang
     
     # 地球拼音轉換國語羅馬字 `Chingyat/rime-romatzyh`
+    - xform/^eh/e/
+    - xform/^wong/ong/
     - xform/^([jqx])u/$1v/
     - xform/([zcsrh])i([1-5])$/$1Y$2/
     - xform/^er/el/
     - xform/^zh/j/
-    - xform/^z([aeiouyY])/tz$1/
-    - xform/^c([aeiouyY])/ts$1/
+    - xform/^z([aeiouvyY])/tz$1/
+    - xform/^c([aeiouvyY])/ts$1/
     - xform/^q/ch/
     - xform/^x/sh/
     - xform/iu([1-5])$/iou$1/
@@ -143,21 +138,28 @@ speller:
     - xform/Y2$/yr/
     - xform/Y3$/yy/
     - xform/Y4$/yh/
+    # 常用字
+    - derive/^shyh$/sh/ # sh 是
+    #- derive/^de5$/d/ # 的地得
+    #- derive/^le5$/l/ # 了
+    #- derive/^ba5$/b/ # 吧罷
     - xform/Y5$/y/
     - xform/5$//
 
-    # 允許混淆
+    # 簡寫/容錯
     - derive/uen$/un/
     - derive/uei/ui/
-    - derive/ong$/ung/
-    
+    - derive/y?[yie]u/v/
+    - derive/on([gq])$/un$1/
+
     # 簡寫法
     - derive/^tz/z/
     - derive/^ts/c/
     - derive/^ch/q/
     - derive/^sh/x/
-    - derive/nn$/m/
-    - derive/rng$/nk/
+    #- derive/nn$/m/
+    #- derive/rng$/nk/
+    #- derive/n([gq])$/$1/
 
     # 簡拼
     - abbrev/^([a-z]).+$/$1/
@@ -168,17 +170,19 @@ speller:
 translator:
   dictionary: terra_pinyin
   prism: romatzyh
-  strict_spelling: true
+  strict_spelling: false # 若設爲true，則單字需正確拼寫聲調
   spelling_hints: 9
   comment_format: &comment
     - erase/^xx$/
+    - xform/\<eh/E/3
     - xform/\<r5/el/
+    - xform/\<wong/ong/
     - xform/\<([jqx])u/$1v/
     - xform/([zcsrh])i([1-5])\>/$1Y$2/
     - xform/\<er/el/
     - xform/\<zh/j/
-    - xform/\<z([aeiouyY])/tz$1/
-    - xform/\<c([aeiouyY])/ts$1/
+    - xform/\<z([aeiouvyY])/tz$1/
+    - xform/\<c([aeiouvyY])/ts$1/
     - xform/\<q/ch/
     - xform/\<x/sh/
     - xform/iu([1-5])\>/iou$1/
@@ -233,16 +237,35 @@ translator:
     - xform/Y4\>/yh/
     - xform/Y5\>/y/
     - xform/\<(\w+)5\>/.$1/
+    - xform/E2\>/èr/
+    - xform/E3\>/èè/
+    - xform/E4\>/èh/
+    - xform/E\>/è/
+
+    # 兒化（按需啓用）
+    - xform/ing el$/iengl/
+    - xform/in el$/iel/
+    - xform/y el$/el/
+    - xform/n el$/l/
+    - xform/(iu?) el$/$1el/
+    - xform/ el$/l/
 
     # 正詞法（按需啓用）
     - xform/^(\w*[^q]) ([aueo]\w*?)$/$1-$2/
     - xform/^(\w*[aeyinl]) (i\w*?)$/$1-$2/
     - xform/^(\w*[nlr]) (h\w*?)$/$1-$2/
     - xform/^(\w*h) (w\w*?)$/$1-$2/
-    - xform/^(\S+?) \.?(\S+?)$/$1$2/
+    - xform/^(\S+?) (\S+?)$/$1$2/
+
+    # 縮寫（按需啓用）
+    - xform/(\w)\.ge\>/$1g/
+    - xform/(\w)\.je\>/$1j/
+    - xform/(\w)\.me\>/$1m/
+    - xform/(\w)\.shy\>/$1sh/
+    - xform/(\w)\.tzy\>/$1tz/
     
   preedit_format:
-    - xform/^(.*)$/$1 / # 顯示所有註釋
+    - xform/^(.*)$/$1​/ # 顯示所有註釋
     
 custom_phrase:
   dictionary: ""
@@ -256,28 +279,34 @@ reverse_lookup:
   overwrite_comment: true
   dictionary: terra_pinyin
   prism: terra_pinyin
-  prefix: "v"
+  enable_completion: true
+  prefix: "`"
   suffix: "'"
   tips: 〔漢語拼音〕
   comment_format: *comment
 
-trad_tw:
-  option_name: trad_tw
-  opencc_config: t2tw.json
+easy_en:
+  tag: easy_en
+  dictionary: easy_en
+  prism: easy_en
+  enable_completion: false
+  enable_sentence: false
+  initial_quality: -1
 
-emoji_suggestion:
-  opencc_config: emoji.json
-  option_name: emoji_suggestion
-  tips: all
+abc_segmentor:
+  extra_tags:
+    #- easy_en
   
 punctuator:
   import_preset: symbols
 
 key_binder:
   import_preset: default
+  bindings:
+    #- { when: has_menu, accept: space, send: Return }
 
 recognizer:
   import_preset: default
   patterns:
     punct: "^/.*$"
-    reverse_lookup: "^v.*$"
+    reverse_lookup: "^`.*$"
