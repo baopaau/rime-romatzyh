@@ -41,5 +41,5 @@ patch:
   recognizer/patterns/expression: "^=.*$"
 
   # Lua腳本：爲候選項加上通字方案的註釋（整句）
-  "engine/filters/@after last": "lua_filter@reverse_lookup_filter_tungdzih"
+  #"engine/filters/@after last": "lua_filter@reverse_lookup_filter_tungdzih"
 
